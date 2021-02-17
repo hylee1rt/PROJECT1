@@ -1,4 +1,4 @@
-This project explores different machine learning models for univariate regression to predict the price of houses in Boston. We will be performing k-fold validation on all the regressors and comparing the average MAE of the mean absolute errors from the folds to evaluate their performance. 
+This project explores different machine learning models for univariate regression to predict the price of houses in Boston using the number of rooms. We will be performing k-fold validation on all the regressors and comparing the average MAE of the mean absolute errors from the folds to evaluate their performance. 
 
 ```python
 
