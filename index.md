@@ -1,10 +1,6 @@
 # Project 1
 
-You can use the [editor on GitHub](https://github.com/hylee1rt/Project1/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-This project explores different univariate regression models to predict the price of houses in Boston.  
+This project explores different machine learning models for univariate regressions to predict the price of houses in Boston. We will be comparing the mean absolute error of all the models to evaluate their performance. 
 
 ```python
 
@@ -151,7 +147,7 @@ print("Validated MAE Local Quartic Kernel Regression = ${:,.2f}".format(1000*np.
 ```
 Validated MAE Local Quartic Kernel Regression = $4,107.47
 
-```pyhon
+```python
 mae_lkc = []
 
 for idxtrain, idxtest in kf.split(dat):
@@ -189,7 +185,7 @@ Validated MAE Random Forest = $4,168.43
 
 ### Neural Networks
 
-This model uses a network of functions, or layers of neurons, to understand and translate a data input of one form into a desired output. The neural network “learns” the data and fine-tunes the weights of the paths between these neurons to come up with accurate predictions.
+This model uses a network of functions, or layers of neurons, to understand and translate a data input of one form into a desired output. The neural network “learns” the data and fine-tunes the weights of the paths between these neurons to come up with accurate predictions. 
 
 ```python
 # imports for creating a Neural Networks
@@ -225,7 +221,7 @@ Validated MAE Neural Network Regression = $4,260.39
 
 ### XGBoost (Extreme Gradient Boost)
 
-This model is a decision-tree-based algorithm that uses an advanced implementation of gradient boosting and regularization for speed and performance.
+This model is a decision-tree-based algorithm that uses an advanced implementation of gradient boosting and regularization framework for speed and performance. It can best be used to solve structured data such as regression, classification, ranking, and user-defined prediction problems. XGBoost focuses on minimizing the errors to turn weak learners into strong learners and "boost" performance.
 
 ```python
 import xgboost as xgb
@@ -246,34 +242,71 @@ print("Validated MAE XGBoost Regression = ${:,.2f}".format(1000*np.mean(mae_xgb)
 ```
 Validated MAE XGBoost Regression = $4,136.63
 
-### Markdown
+### Support Vector Machine
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+SVMs work to find the best line (or hyperplane in n-dimensional space) that separates the data into separate classes. The objectice is to find a hyperplane with the maximum margin - the maximum distance between data points of distinct classes. Support vectors are co-ordinates of individual data points that are closer to the hyperplane and influence the position and orientation of the hyperplane.
 
-```markdown
-Syntax highlighted code block
+```python
+from sklearn.svm import SVR
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+svr_rbf = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=.1)
+svr_lin = SVR(kernel='linear', C=100, gamma='auto')
+svr_poly = SVR(kernel='poly', C=100, gamma='auto', degree=4, epsilon=.1,coef0=1)
+svr_sigm = SVR(kernel='sigmoid', C=100, gamma='auto', degree=4, epsilon=.1,coef0=1)
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+```python
+model = svr_rbf
+mae_svr = []
 
-### Jekyll Themes
+for idxtrain, idxtest in kf.split(dat):
+  X_train = dat[idxtrain,0]
+  y_train = dat[idxtrain,1]
+  X_test  = dat[idxtest,0]
+  y_test = dat[idxtest,1]
+  model.fit(X_train.reshape(-1,1),y_train)
+  yhat_svr = model.predict(X_test.reshape(-1,1))
+  mae_svr.append(mean_absolute_error(y_test, yhat_svr))
+print("Validated MAE Support Vector Regression = ${:,.2f}".format(1000*np.mean(mae_svr)))
+```
+Validated MAE Support Vector Regression = $4,130.50
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/hylee1rt/Project1/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+```python
+model = svr_lin
+mae_svr = []
 
-### Support or Contact
+for idxtrain, idxtest in kf.split(dat):
+  X_train = dat[idxtrain,0]
+  y_train = dat[idxtrain,1]
+  X_test  = dat[idxtest,0]
+  y_test = dat[idxtest,1]
+  model.fit(X_train.reshape(-1,1),y_train)
+  yhat_svr = model.predict(X_test.reshape(-1,1))
+  mae_svr.append(mean_absolute_error(y_test, yhat_svr))
+print("Validated MAE Support Vector Regression = ${:,.2f}".format(1000*np.mean(mae_svr)))
+```
+Validated MAE Support Vector Regression = $4,432.00
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+*Poly kernel skipped because it takes so long..!*
+
+```python
+model = svr_sigm
+mae_svr = []
+for idxtrain, idxtest in kf.split(dat):
+  X_train = dat[idxtrain,0]
+  y_train = dat[idxtrain,1]
+  X_test  = dat[idxtest,0]
+  y_test = dat[idxtest,1]
+  model.fit(X_train.reshape(-1,1),y_train)
+  yhat_svr = model.predict(X_test.reshape(-1,1))
+  mae_svr.append(mean_absolute_error(y_test, yhat_svr))
+print("Validated MAE Support Vector Regression = ${:,.2f}".format(1000*np.mean(mae_svr)))
+```
+Validated MAE Support Vector Regression = $6,540.67
+
+*oof..*
+
+
+
+
+
