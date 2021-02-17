@@ -1,6 +1,6 @@
 # Project 1
 
-This project explores different machine learning models for univariate regression to predict the price of houses in Boston. We will be comparing the mean absolute error of all the models to evaluate their performance. 
+This project explores different machine learning models for univariate regression to predict the price of houses in Boston. We will be performing k-fold validation on all the regressors and comparing the average MAE of the mean absolute errors from the folds to evaluate their performance. 
 
 ```python
 
@@ -32,7 +32,7 @@ dat_test = dat_test[np.argsort(dat_test[:, 0])]
 
 ### Linear Regression 
 
-This model shows the linear relationship between number of rooms and the price of the house. The k-fold cross validation gives us the average of the mean absolute errors of each fold.
+This classic model shows the linear relationship between number of rooms and the price of the house. The k-fold cross validation gives us the average of the mean absolute errors of each fold.
 
 ```python
 from sklearn.linear_model import LinearRegression
@@ -79,18 +79,18 @@ def Cosine(x):
 ```
 ```python
 def lowess_kern(x, y, kern, tau):
-    n = len(x)
-    yest = np.zeros(n) 
-    w = np.array([kern((x - x[i])/(2*tau)) for i in range(n)])     
-    for i in range(n):
-        weights = w[:, i]
-        b = np.array([np.sum(weights * y), np.sum(weights * y * x)])
-        A = np.array([[np.sum(weights), np.sum(weights * x)],
+  n = len(x)
+  yest = np.zeros(n) 
+  w = np.array([kern((x - x[i])/(2*tau)) for i in range(n)])     
+  for i in range(n):
+      weights = w[:, i]
+      b = np.array([np.sum(weights * y), np.sum(weights * y * x)])
+      A = np.array([[np.sum(weights), np.sum(weights * x)],
                     [np.sum(weights * x), np.sum(weights * x * x)]])
-        theta, res, rnk, s = linalg.lstsq(A, b)
-        yest[i] = theta[0] + theta[1] * x[i] 
+      theta, res, rnk, s = linalg.lstsq(A, b)
+      yest[i] = theta[0] + theta[1] * x[i] 
 
-    return yest
+  return yest
 
 def model_lowess(dat_train,dat_test,kern,tau):
   dat_train = dat_train[np.argsort(dat_train[:, 0])]
