@@ -1,4 +1,4 @@
-## Project 1
+# Project 1
 
 You can use the [editor on GitHub](https://github.com/hylee1rt/Project1/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
@@ -36,6 +36,8 @@ dat_test = dat_test[np.argsort(dat_test[:, 0])]
 
 ### Linear Regression 
 
+This model shows the linear relationship between number of rooms and the price of the house. The k-fold cross validation gives us the average of the mean absolute errors of each fold.
+
 ```python
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold
@@ -60,10 +62,189 @@ print("Validated MAE Linear Regression = ${:,.2f}".format(1000*np.mean(mae_lm)))
 
 Validated MAE Linear Regression = $4,433.17
 
+### Kernel Weighted Regressions
+
+Locally weighted regresssions are non-parametric regression methods that combine multiple regression models in a k-nearest-neighbor-based meta-model. They are used to fit simple models to localized subsets of the data to build up a function that describes the variation in the data. Weights applied to each point help identify regions that contribute more heavily to the model.
+
+The different kernels apply different weights to each point. We are looking for the model with the lowest average of mean absolute error obtained from k-fold validation. 
+
+```python
+# Tricubic Kernel
+def Tricubic(x):
+  return np.where(np.abs(x)>1,0,70/81*(1-np.abs(x)**3)**3)
+# Epanechnikov Kernel
+def Epanechnikov(x):
+  return np.where(np.abs(x)>1,0,3/4*(1-np.abs(x)**2)) 
+# Quartic Kernel
+def Quartic(x):
+  return np.where(np.abs(x)>1,0,15/16*(1-np.abs(x)**2)**2) 
+# Cosine Kernel 
+def Cosine(x): 
+  return np.where(np.abs(x)>1,0,(np.pi/4)*np.cos((np.pi/2)*np.radians(np.abs(x))))
+```
+```python
+#Defining the kernel local regression model
+
+def lowess_kern(x, y, kern, tau):
+
+    # tau is called bandwidth K((x-x[i])/(2*tau))
+
+    n = len(x)
+    yest = np.zeros(n)
+
+    #Initializing all weights from the kernel function by using only the train data    
+    w = np.array([kern((x - x[i])/(2*tau)) for i in range(n)])     
+    
+    #Looping through all x-points
+    for i in range(n):
+        weights = w[:, i]
+        b = np.array([np.sum(weights * y), np.sum(weights * y * x)])
+        A = np.array([[np.sum(weights), np.sum(weights * x)],
+                    [np.sum(weights * x), np.sum(weights * x * x)]])
+        theta, res, rnk, s = linalg.lstsq(A, b)
+        yest[i] = theta[0] + theta[1] * x[i] 
+
+    return yest
+
+def model_lowess(dat_train,dat_test,kern,tau):
+  dat_train = dat_train[np.argsort(dat_train[:, 0])]
+  dat_test = dat_test[np.argsort(dat_test[:, 0])]
+  Yhat_lowess = lowess_kern(dat_train[:,0],dat_train[:,1],kern,tau)
+  datl = np.concatenate([dat_train[:,0].reshape(-1,1),Yhat_lowess.reshape(-1,1)], axis=1)
+  f = interp1d(datl[:,0], datl[:,1],fill_value='extrapolate')
+  return f(dat_test[:,0])
+```
+
+```python
+mae_lke = []
+
+for idxtrain, idxtest in kf.split(dat):
+  dat_test = dat[idxtest,:]
+  y_test = dat_test[np.argsort(dat_test[:, 0]),1]
+  yhat_lke = model_lowess(dat[idxtrain,:],dat[idxtest,:],Epanechnikov,0.45)
+  mae_lke.append(mean_absolute_error(y_test, yhat_lke))
+print("Validated MAE Local Epanechnikov Kernel Regression = ${:,.2f}".format(1000*np.mean(mae_lke)))
+```
+Validated MAE Local Epanechnikov Kernel Regression = $4,113.99
+
+```python 
+mae_lkt = []
+
+for idxtrain, idxtest in kf.split(dat):
+  dat_test = dat[idxtest,:]
+  y_test = dat_test[np.argsort(dat_test[:, 0]),1]
+  yhat_lkt = model_lowess(dat[idxtrain,:],dat[idxtest,:],Tricubic,0.45)
+  mae_lkt.append(mean_absolute_error(y_test, yhat_lkt))
+print("Validated MAE Local Tricubic Kernel Regression = ${:,.2f}".format(1000*np.mean(mae_lkt)))
+```
+Validated MAE Local Tricubic Kernel Regression = $4,110.37
+
+```python
+mae_lkq = []
+
+for idxtrain, idxtest in kf.split(dat):
+  dat_test = dat[idxtest,:]
+  y_test = dat_test[np.argsort(dat_test[:, 0]),1]
+  yhat_lkq = model_lowess(dat[idxtrain,:],dat[idxtest,:],Quartic,0.45)
+  mae_lkq.append(mean_absolute_error(y_test, yhat_lkq))
+print("Validated MAE Local Quartic Kernel Regression = ${:,.2f}".format(1000*np.mean(mae_lkq)))
+```
+Validated MAE Local Quartic Kernel Regression = $4,107.47
+
+```pyhon
+mae_lkc = []
+
+for idxtrain, idxtest in kf.split(dat):
+  dat_test = dat[idxtest,:]
+  y_test = dat_test[np.argsort(dat_test[:, 0]),1]
+  yhat_lkc = model_lowess(dat[idxtrain,:],dat[idxtest,:],Cosine,0.45)
+  mae_lkc.append(mean_absolute_error(y_test, yhat_lkc))
+print("Validated MAE Local Quartic Kernel Regression = ${:,.2f}".format(1000*np.mean(mae_lkc)))
+```
+Validated MAE Local Quartic Kernel Regression = $4,125.13
 
 
+### Random Forest
 
+Random Forest is a classification model that consists of multiple, independent decision trees. 
 
+```python
+from sklearn.ensemble import RandomForestRegressor
+
+rf = RandomForestRegressor(n_estimators=1000,max_depth=3)
+mae_rf = []
+
+for idxtrain, idxtest in kf.split(dat):
+  X_train = dat[idxtrain,0]
+  y_train = dat[idxtrain,1]
+  X_test  = dat[idxtest,0]
+  y_test = dat[idxtest,1]
+  rf.fit(X_train.reshape(-1,1),y_train)
+  yhat_rf = rf.predict(X_test.reshape(-1,1))
+  mae_rf.append(mean_absolute_error(y_test, yhat_rf))
+print("Validated MAE RF = ${:,.2f}".format(1000*np.mean(mae_rf)))
+
+```
+Validated MAE Random Forest = $4,168.43
+
+### Neural Networks
+
+This model uses a network of functions, or layers of neurons, to understand and translate a data input of one form into a desired output. The neural network “learns” the data and fine-tunes the weights of the paths between these neurons to come up with accurate predictions.
+
+```python
+# imports for creating a Neural Networks
+import keras
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Dropout
+from sklearn.metrics import r2_score
+from keras.optimizers import Adam
+from keras.callbacks import EarlyStopping
+
+```python
+model = Sequential()
+model.add(Dense(128, activation="relu", input_dim=1))
+model.add(Dense(32, activation="relu"))
+model.add(Dense(8, activation="relu"))
+model.add(Dense(1, activation="linear"))
+model.compile(loss='mean_absolute_error', optimizer=Adam(lr=1e-3, decay=1e-3 / 200))
+mae_nn = []
+
+for idxtrain, idxtest in kf.split(dat):
+  X_train = dat[idxtrain,0]
+  y_train = dat[idxtrain,1]
+  X_test  = dat[idxtest,0]
+  y_test = dat[idxtest,1]
+  es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=200)
+  model.fit(X_train.reshape(-1,1),y_train,validation_split=0.3, epochs=1000, batch_size=100, verbose=0, callbacks=[es])
+  yhat_nn = model.predict(X_test.reshape(-1,1))
+  mae_nn.append(mean_absolute_error(y_test, yhat_nn))
+print("Validated MAE Neural Network Regression = ${:,.2f}".format(1000*np.mean(mae_nn)))
+```
+Validated MAE Neural Network Regression = $4,260.39
+
+### XGBoost (Extreme Gradient Boost)
+
+This model is a decision-tree-based algorithm that uses an advanced implementation of gradient boosting and regularization for speed and performance.
+
+```python
+import xgboost as xgb
+model_xgb = xgb.XGBRegressor(objective ='reg:squarederror',n_estimators=100,reg_lambda=20,alpha=1,gamma=10,max_depth=3)
+```
+```python
+mae_xgb = []
+
+for idxtrain, idxtest in kf.split(dat):
+  X_train = dat[idxtrain,0]
+  y_train = dat[idxtrain,1]
+  X_test  = dat[idxtest,0]
+  y_test = dat[idxtest,1]
+  model_xgb.fit(X_train.reshape(-1,1),y_train)
+  yhat_xgb = model_xgb.predict(X_test.reshape(-1,1))
+  mae_xgb.append(mean_absolute_error(y_test, yhat_xgb))
+print("Validated MAE XGBoost Regression = ${:,.2f}".format(1000*np.mean(mae_xgb)))
+```
+Validated MAE XGBoost Regression = $4,136.63
 
 ### Markdown
 
