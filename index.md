@@ -294,7 +294,7 @@ Validated MAE Support Vector Regression = $6,540.67
 
 *...oof.*
 
-### Conclusion 
+## Conclusion 
 
 The locally weighted regression (LOWESS) with Quartic kernel had the lowest mean absolute error of $4,107.47, performing the best (even better than neural network!).
 
