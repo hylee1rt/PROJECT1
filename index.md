@@ -1,6 +1,6 @@
 # Project 1
 
-This project explores different machine learning models for univariate regressions to predict the price of houses in Boston. We will be comparing the mean absolute error of all the models to evaluate their performance. 
+This project explores different machine learning models for univariate regression to predict the price of houses in Boston. We will be comparing the mean absolute error of all the models to evaluate their performance. 
 
 ```python
 
@@ -157,7 +157,7 @@ for idxtrain, idxtest in kf.split(dat):
   mae_lkc.append(mean_absolute_error(y_test, yhat_lkc))
 print("Validated MAE Local Quartic Kernel Regression = ${:,.2f}".format(1000*np.mean(mae_lkc)))
 ```
-Validated MAE Local Quartic Kernel Regression = $4,125.13
+Validated MAE Local Cosine Kernel Regression = $4,125.13
 
 
 ### Random Forest
@@ -244,7 +244,7 @@ Validated MAE XGBoost Regression = $4,136.63
 
 ### Support Vector Machine
 
-SVMs work to find the best line (or hyperplane in n-dimensional space) that separates the data into separate classes. The objectice is to find a hyperplane with the maximum margin - the maximum distance between data points of distinct classes. Support vectors are co-ordinates of individual data points that are closer to the hyperplane and influence the position and orientation of the hyperplane.
+SVMs work to find the best line (or hyperplane in n-dimensional space) that separates the data into separate classes. The objectice is to find a hyperplane with the maximum margin - the maximum distance between data points of distinct classes. Support vectors are co-ordinates of individual data points that are closer to the hyperplane and influence the position and orientation of the hyperplane. 
 
 ```python
 from sklearn.svm import SVR
@@ -304,9 +304,8 @@ print("Validated MAE Support Vector Regression = ${:,.2f}".format(1000*np.mean(m
 ```
 Validated MAE Support Vector Regression = $6,540.67
 
-*oof..*
+*...oof.*
 
-
-
+Based on the results of the above regressors, the locally weighted regression (LOWESS) with Quartic kernel had the lowest mean absolute error of $4,107.47. For our purposes, this model performed the best (even better than neural network!).
 
 
