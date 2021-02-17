@@ -28,7 +28,7 @@ dat_test = np.concatenate([X_test,y_test.reshape(-1,1)], axis=1)
 dat_test = dat_test[np.argsort(dat_test[:, 0])]
 ```
 
-### Linear Regression 
+## Linear Regression 
 
 This classic model shows the linear relationship between number of rooms and the price of the house. The k-fold cross validation gives us the average of the mean absolute errors of each fold.
 
@@ -56,7 +56,7 @@ print("Validated MAE Linear Regression = ${:,.2f}".format(1000*np.mean(mae_lm)))
 
 Validated MAE Linear Regression = $4,433.17
 
-### Kernel Weighted Regressions
+## Kernel Weighted Regressions
 
 Locally weighted regresssions are non-parametric regression methods that combine multiple regression models in a k-nearest-neighbor-based meta-model. They are used to fit simple models to localized subsets of the data to build up a function that describes the variation in the data. Weights applied to each point help identify regions that contribute more heavily to the model.
 
@@ -148,7 +148,7 @@ print("Validated MAE Local Quartic Kernel Regression = ${:,.2f}".format(1000*np.
 Validated MAE Local Cosine Kernel Regression = $4,125.13
 
 
-### Random Forest
+## Random Forest
 
 Random Forest is a classification model that consists of multiple, independent decision trees. 
 
@@ -171,7 +171,7 @@ print("Validated MAE RF = ${:,.2f}".format(1000*np.mean(mae_rf)))
 ```
 Validated MAE Random Forest = $4,168.43
 
-### Neural Networks
+## Neural Networks
 
 This model uses a network of functions, or layers of neurons, to understand and translate a data input of one form into a desired output. The neural network “learns” the data and fine-tunes the weights of the paths between these neurons to come up with accurate predictions. 
 
@@ -207,7 +207,7 @@ print("Validated MAE Neural Network Regression = ${:,.2f}".format(1000*np.mean(m
 ```
 Validated MAE Neural Network Regression = $4,260.39
 
-### XGBoost (Extreme Gradient Boost)
+## XGBoost (Extreme Gradient Boost)
 
 This model is a decision-tree-based algorithm that uses an advanced implementation of gradient boosting and regularization framework for speed and performance. It can best be used to solve structured data such as regression, classification, ranking, and user-defined prediction problems. XGBoost focuses on minimizing the errors to turn weak learners into strong learners and "boost" performance.
 
@@ -230,7 +230,7 @@ print("Validated MAE XGBoost Regression = ${:,.2f}".format(1000*np.mean(mae_xgb)
 ```
 Validated MAE XGBoost Regression = $4,136.63
 
-### Support Vector Machine
+## Support Vector Machine
 
 SVMs work to find the best line (or hyperplane in n-dimensional space) that separates the data into separate classes. The objective is to find a hyperplane with the maximum margin - the maximum distance between data points of distinct classes. Support vectors are co-ordinates of individual data points that are closer to the hyperplane and influence the position and orientation of the hyperplane. 
 
