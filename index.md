@@ -65,33 +65,23 @@ Locally weighted regresssions are non-parametric regression methods that combine
 The different kernels apply different weights to each point. We are looking for the model with the lowest average of mean absolute error obtained from k-fold validation. 
 
 ```python
-# Tricubic Kernel
 def Tricubic(x):
   return np.where(np.abs(x)>1,0,70/81*(1-np.abs(x)**3)**3)
-# Epanechnikov Kernel
+
 def Epanechnikov(x):
   return np.where(np.abs(x)>1,0,3/4*(1-np.abs(x)**2)) 
-# Quartic Kernel
+
 def Quartic(x):
   return np.where(np.abs(x)>1,0,15/16*(1-np.abs(x)**2)**2) 
-# Cosine Kernel 
+
 def Cosine(x): 
   return np.where(np.abs(x)>1,0,(np.pi/4)*np.cos((np.pi/2)*np.radians(np.abs(x))))
 ```
 ```python
-#Defining the kernel local regression model
-
 def lowess_kern(x, y, kern, tau):
-
-    # tau is called bandwidth K((x-x[i])/(2*tau))
-
     n = len(x)
-    yest = np.zeros(n)
-
-    #Initializing all weights from the kernel function by using only the train data    
+    yest = np.zeros(n) 
     w = np.array([kern((x - x[i])/(2*tau)) for i in range(n)])     
-    
-    #Looping through all x-points
     for i in range(n):
         weights = w[:, i]
         b = np.array([np.sum(weights * y), np.sum(weights * y * x)])
@@ -244,7 +234,7 @@ Validated MAE XGBoost Regression = $4,136.63
 
 ### Support Vector Machine
 
-SVMs work to find the best line (or hyperplane in n-dimensional space) that separates the data into separate classes. The objectice is to find a hyperplane with the maximum margin - the maximum distance between data points of distinct classes. Support vectors are co-ordinates of individual data points that are closer to the hyperplane and influence the position and orientation of the hyperplane. 
+SVMs work to find the best line (or hyperplane in n-dimensional space) that separates the data into separate classes. The objective is to find a hyperplane with the maximum margin - the maximum distance between data points of distinct classes. Support vectors are co-ordinates of individual data points that are closer to the hyperplane and influence the position and orientation of the hyperplane. 
 
 ```python
 from sklearn.svm import SVR
@@ -306,6 +296,8 @@ Validated MAE Support Vector Regression = $6,540.67
 
 *...oof.*
 
-Based on the results of the above regressors, the locally weighted regression (LOWESS) with Quartic kernel had the lowest mean absolute error of $4,107.47. For our purposes, this model performed the best (even better than neural network!).
+### Conclusion 
+
+The locally weighted regression (LOWESS) with Quartic kernel had the lowest mean absolute error of $4,107.47, performing the best (even better than neural network!).
 
 
